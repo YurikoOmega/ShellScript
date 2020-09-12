@@ -1,0 +1,32 @@
+#!/bin/bash
+type optipng >/dev/null 2>&1 || {
+	echo >&2 "<optipng> command is not find. I will automatically install <optipng>";
+	brew install optipng
+}
+type jpegoptim >/dev/null 2>&1 || {
+	echo >&2 "<jpegoptim> command is not find. I will automatically install <jpegoptim>";
+	brew install jpegoptim
+}
+echo "Input the optimization rate for jpeg file you expect:(0-100, bigger the number you enter, larger the size after optimized)"
+read OPTI_JPEG
+while [[ ! $OPTI_JPEG =~ ^[0-9]*$ ]] || [[ $OPTI_JPEG -lt 0 ]] || [[ $OPTI_JPEG -gt 100 ]]; do
+	echo "Invaild number, please enter the number(0-100)"
+	read OPTI_JPEG
+done
+for i in `git status | grep .png`; do
+	if [[ -f $i ]]; then
+		optipng $i
+	fi
+done
+for i in `git status | grep .jpg`; do
+	if [[ -f $i ]]; then
+		jpegoptim -m $OPTI_JPEG $i
+	fi
+done
+git add .
+echo "Input the git commitment>"
+read GIT_COMMITMENT
+git commit -m "$GIT_COMMITMENT"
+FIRST_STATUS=`git status | head -n 1`
+CURRENT_BRANCH=${FIRST_STATUS#On branch }
+git push -u `git remote` $CURRENT_BRANCH

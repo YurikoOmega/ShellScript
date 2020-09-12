@@ -1,0 +1,27 @@
+#!/bin/bash
+#first script 
+while [[ ! -d $DECRYPTED_FILE_DIRECTORY ]]; do
+	echo "Invalid decrypted file diretory"
+	echo "Input the decrypted files' directory >"
+	read DECRYPTED_FILE_DIRECTORY
+done
+
+while [[ ! -d $APPLICATION_APP_PATH ]] || [[ ! $APPLICATION_APP_PATH =~ .app$ ]]; do
+	echo "Invalid application path"
+	echo "Input the application's path (.app) >"
+	read APPLICATION_APP_PATH
+done
+for file in $(ls $DECRYPTED_FILE_DIRECTORY) ; do 
+	newfile=${file%.decrypted}
+	frameworkFile=$APPLICATION_APP_PATH/Frameworks/$newfile.framework/$newfile
+	if [[ -f $frameworkFile ]]; then
+		mv -f $DECRYPTED_FILE_DIRECTORY/$file $frameworkFile
+		chmod 777 $frameworkFile
+		echo "The framework executable file -$newfile has been moved."
+	elif [[ -f $APPLICATION_APP_PATH/$newfile ]]; then
+		mv -f $DECRYPTED_FILE_DIRECTORY/$file $APPLICATION_APP_PATH/$newfile
+		chmod 777 $APPLICATION_APP_PATH/$newfile
+		echo "The main executable file -$newfile has been moved."
+	fi
+done
+echo "Move decrypted file completed."
