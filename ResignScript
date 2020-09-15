@@ -3,12 +3,12 @@ echo "Input application file:(.ipa)"
 read APPLICATION_ZIP
 echo "Input mobileprovision file:(.provision)"
 read PROVISION_FILE
+security find-identity -v -p codesigning -v
 echo 'Identity list below, choose one matches your mobileprovision file(eg: "1) XXXXXX" you should input 1 )'
 read A
 unzip $APPLICATION_ZIP
 APP_NAME=`ls Payload | grep .app`
 APPLICATION_PATH="Payload/$APP_NAME"
-security find-identity -v -p codesigning -v
 INDENTITY_LIST=`security find-identity -v -p codesigning -v`
 INDENTITY=`echo $INDENTITY_LIST | grep $A`
 INDENTITY=${INDENTITY#*$A) }
