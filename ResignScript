@@ -33,4 +33,8 @@ rm -rf profile.plist
 rm -rf entitlements.plist
 zip -ry "$APP_NAME.ipa" Payload
 rm -rf Payload
-echo "Resign Complete"
+if [[ -f $APP_NAME.ipa ]];then
+	echo "Resign Complete. $APP_NAME.ipa has been produced."
+else
+	echo "Resign failed."
+fi
