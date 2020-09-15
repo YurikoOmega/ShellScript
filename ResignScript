@@ -1,10 +1,10 @@
 #!/bin/bash
 echo "Input application file:(.ipa)"
 read APPLICATION_ZIP
-echo "Input mobileprovision file:(.provision)"
+echo "Input mobileprovision file:(.moblieprovision)"
 read PROVISION_FILE
 security find-identity -v -p codesigning -v
-echo 'Identity list below, choose one matches your mobileprovision file(eg: "1) XXXXXX" you should input 1 )'
+echo 'Identity list above, choose one matches your mobileprovision file(eg: "1) XXXXXX" you should input 1 )'
 read A
 unzip $APPLICATION_ZIP
 APP_NAME=`ls Payload | grep .app`
