@@ -1,0 +1,36 @@
+#!/bin/bash
+echo "Input application file:(.ipa)"
+read APPLICATION_ZIP
+echo "Input mobileprovision file:(.provision)"
+read PROVISION_FILE
+echo 'Identity list below, choose one matches your mobileprovision file(eg: "1) XXXXXX" you should input 1 )'
+read A
+unzip $APPLICATION_ZIP
+APP_NAME=`ls Payload | grep .app`
+APPLICATION_PATH="Payload/$APP_NAME"
+security find-identity -v -p codesigning -v
+INDENTITY_LIST=`security find-identity -v -p codesigning -v`
+INDENTITY=`echo $INDENTITY_LIST | grep $A`
+INDENTITY=${INDENTITY#*$A) }
+INDENTITY=${INDENTITY%% *}
+security cms -D -i $PROVISION_FILE > profile.plist
+/usr/libexec/PlistBuddy -x -c 'Print :Entitlements' profile.plist > entitlements.plist
+cp "$PROVISION_FILE" "$APPLICATION_PATH/embedded.mobileprovision"
+INFO=`/usr/libexec/PlistBuddy -c "Print :Entitlements" profile.plist | grep application-identifier`
+BUNDLE_ID=${INFO#*.}
+echo "BUNDLE_ID: $BUNDLE_ID"
+/usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_ID" "$APPLICATION_PATH/Info.plist"
+rm -rf "$APPLICATION_PATH/_CodeSignature"
+for file in `ls "$APPLICATION_PATH/Frameworks"`; do
+	codesign --force --sign "$INDENTITY" --entitlements entitlements.plist "$APPLICATION_PATH/Frameworks/$file"
+done
+APP_NAME=${APPLICATION_PATH%.app}
+APP_NAME=${APP_NAME##*/}
+codesign --force --sign $INDENTITY --entitlements entitlements.plist "$APPLICATION_PATH/$APP_NAME"
+rm -rf "$APPLICATION_PATH/Plugins" || true
+rm -rf "$APPLICATION_PATH/Watch" || true
+rm -rf profile.plist
+rm -rf entitlements.plist
+zip -ry "$APP_NAME.ipa" Payload
+rm -rf Payload
+echo "Resign Complete"
