@@ -3,12 +3,14 @@ echo "Input the application path:(.app)>"
 read APPLICATION_APP_PATH
 MAIN_EXCUTABLE_FILE=${APPLICATION_APP_PATH%.app}
 MAIN_EXCUTABLE_FILE=${MAIN_EXCUTABLE_FILE##*/}
-lipo $APPLICATION_APP_PATH/$MAIN_EXCUTABLE_FILE -thin arm64 -output $APPLICATION_APP_PATH/$MAIN_EXCUTABLE_FILE/$MAIN_EXCUTABLE_FILE
+lipo $APPLICATION_APP_PATH/$MAIN_EXCUTABLE_FILE -thin arm64 -output $APPLICATION_APP_PATH/$MAIN_EXCUTABLE_FILE
 FRAMEWORK_PATH=$APPLICATION_APP_PATH/Frameworks
 for directory in `ls $FRAMEWORK_PATH`; do
 	if [[ $directory =~ .framework$ ]]; then
 		FRAMEWORK_FILE=$APPLICATION_APP_PATH/Frameworks/$directory/${directory%.framework}
 		lipo $FRAMEWORK_FILE -thin arm64 -output $FRAMEWORK_FILE
+	else
+		lipo $APPLICATION_APP_PATH/Frameworks/$directory -thin arm64 -output $APPLICATION_APP_PATH/Frameworks/$directory
 	fi
 done
 
