@@ -15,6 +15,8 @@ INDENTITY=${INDENTITY#*$A) }
 INDENTITY=${INDENTITY%% *}
 security cms -D -i $PROVISION_FILE > profile.plist
 /usr/libexec/PlistBuddy -x -c 'Print :Entitlements' profile.plist > entitlements.plist
+rm -rf "$APPLICATION_PATH/PlugIns" || true
+rm -rf "$APPLICATION_PATH/Watch" || true
 cp "$PROVISION_FILE" "$APPLICATION_PATH/embedded.mobileprovision"
 INFO=`/usr/libexec/PlistBuddy -c "Print :Entitlements" profile.plist | grep application-identifier`
 BUNDLE_ID=${INFO#*.}
@@ -27,8 +29,6 @@ done
 APP_NAME=${APPLICATION_PATH%.app}
 APP_NAME=${APP_NAME##*/}
 codesign --force --sign $INDENTITY --entitlements entitlements.plist "$APPLICATION_PATH/$APP_NAME"
-rm -rf "$APPLICATION_PATH/Plugins" || true
-rm -rf "$APPLICATION_PATH/Watch" || true
 rm -rf profile.plist
 rm -rf entitlements.plist
 zip -ry "$APP_NAME.ipa" Payload
