@@ -1,0 +1,13 @@
+#!/bin/bash
+if [ $# = 0 ]; then
+	echo "format should be Script (arg1 arg2 ...)"
+	exit 1
+fi
+for i in $@; do
+	if [[ -d $i ]]; then
+		for file in `ls $i`; do
+			mv -f "$i/$file" `pwd`
+		done
+		rm -rf $i
+	fi
+done
