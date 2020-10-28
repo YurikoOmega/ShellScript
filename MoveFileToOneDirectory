@@ -4,6 +4,15 @@ if [ $# = 0 ]; then
 	exit 1
 fi
 for i in $@; do
+	if [[ $i =~ .zip$ ]]; then
+		 unzip $i
+		 NEW_DIRECT=${i%.zip}
+		 for file in `ls $NEW_DIRECT`; do
+		 	mv -f "$NEW_DIRECT/$file" `pwd`
+		done
+		rm -rf $i
+		rm -rf $NEW_DIRECT
+	fi
 	if [[ -d $i ]]; then
 		for file in `ls $i`; do
 			mv -f "$i/$file" `pwd`
